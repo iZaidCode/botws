@@ -37,15 +37,16 @@ app.get('/healthz', (req, res) => {
 });
 
 client.on('qr', qr => {
+    console.log('QR generado:');
     qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
-    console.log('Conexion exitosa nenes');
+    console.log('Conexión exitosa');
 });
 
 client.initialize();
 
 app.listen(3000, () => {
-    console.log('Servidor corriendo en http://localhost:3000');
+    console.log('Servidor corriendo en https://botws-jc30.onrender.com');
 });
