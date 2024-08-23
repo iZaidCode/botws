@@ -1,31 +1,36 @@
-# Usa una imagen base de Node.js
-FROM node:18
+FROM node:14
 
-# Crea y establece el directorio de trabajo
-WORKDIR /app
+# Instalar dependencias
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libxss1 \
+    libgbm1 \
+    libgtk-3-0 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libpangoft2-1.0-0 \
+    libpangocairo-1.0-0 \
+    libfontconfig1 \
+    libdbus-1-3 \
+    wget
 
-# Copia el package.json y package-lock.json (o yarn.lock) al contenedor
+# Crear directorio de la aplicación
+WORKDIR /usr/src/app
+
+# Copiar archivos
 COPY package*.json ./
-
-# Instala las dependencias globales
-RUN npm install -g n
-
-# Instala las dependencias del proyecto
-RUN npm install \
-    whatsapp-web.js \
-    rimraf@latest \
-    glob@latest \
-    puppeteer@latest \
-    qrcode-terminal \
-    express \
-    body-parser
-
-# Copia el resto de los archivos del proyecto al contenedor
+RUN npm install
 COPY . .
 
-# Expone el puerto en el que tu aplicación estará escuchando
+# Exponer el puerto
 EXPOSE 3000
 
-# Comando para ejecutar tu aplicación
-CMD ["node", "main.js"]
+# Ejecutar la aplicación
+CMD ["node", "index.js"]
 
