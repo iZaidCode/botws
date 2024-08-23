@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const client = new Client({
@@ -15,10 +17,13 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+// Serve the QR code image
+app.use('/qr', express.static(__dirname));
+
 // Handle form submission
 app.post('/send-message', (req, res) => {
     const { number } = req.body;
-    const text = "Esta es una prueba de mensaje automatico";
+    const text = "Esta es una prueba de mensaje automático";
 
     const chatId = number.substring(1) + "@c.us";
 
@@ -37,8 +42,15 @@ app.get('/healthz', (req, res) => {
 });
 
 client.on('qr', qr => {
-    console.log('QR generado:');
-    qrcode.generate(qr, { small: true });
+    qrcode.toDataURL(qr, (err, url) => {
+        if (err) {
+            console.error('Error al generar el QR:', err);
+            return;
+        }
+        const base64Data = url.replace(/^data:image\/png;base64,/, "");
+        fs.writeFileSync(path.join(__dirname, 'qr.png'), base64Data, 'base64');
+        console.log('QR guardado en qr.png');
+    });
 });
 
 client.on('ready', () => {
@@ -48,5 +60,5 @@ client.on('ready', () => {
 client.initialize();
 
 app.listen(3000, () => {
-    console.log('Servidor corriendo en https://botws-jc30.onrender.com');
+    console.log('Servidor corriendo en http://localhost:3000');
 });
