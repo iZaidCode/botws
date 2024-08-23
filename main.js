@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const qrcode = require('qrcode-terminal');
+const qrcode = require('qrcode');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const fs = require('fs');
 const path = require('path');
@@ -42,13 +42,11 @@ app.get('/healthz', (req, res) => {
 });
 
 client.on('qr', qr => {
-    qrcode.toDataURL(qr, (err, url) => {
+    qrcode.toFile(path.join(__dirname, 'qr.png'), qr, (err) => {
         if (err) {
             console.error('Error al generar el QR:', err);
             return;
         }
-        const base64Data = url.replace(/^data:image\/png;base64,/, "");
-        fs.writeFileSync(path.join(__dirname, 'qr.png'), base64Data, 'base64');
         console.log('QR guardado en qr.png');
     });
 });
